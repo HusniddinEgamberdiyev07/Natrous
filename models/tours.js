@@ -26,6 +26,10 @@ const toursSchema = new mongoose.Schema({
         type:String,
         required:[true, "Tour must have a difficulty"]
     },
+    duration:{
+        type:Number,
+        reqiured:[true, "Tour must have a duration"]
+    },
     summary:{
         type:String,
         required:[true, "Tour must have summary"],
