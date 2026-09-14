@@ -21,6 +21,7 @@ app.use("/api/users/", userRouter)
 app.use((err, req, res, next)=>{
     res.status(500).json({
         status:"fail",
+        message:err.stack
     })
 })
 

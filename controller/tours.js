@@ -5,7 +5,6 @@ exports.getAllTours = async (req, res)=>{
     try{
         const features =  new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().pagination();
         const tours = await features.query;
-        console.log(tours);
         
         res.status(200).json({
             status:"success",
@@ -81,3 +80,55 @@ exports.deleteTour = async (req, res)=>{
         })
     }
 };
+
+exports.tourStats = async (req, res)=>{
+    const stats = await Tour.aggregate([
+        {
+            $match:{
+                ratingAverage:{
+                    $gte:4.5
+                }
+            }
+        }, // stage
+        {
+            $group:{
+                _id:"$difficulty",
+                numTours:{
+                    $sum:1
+                },
+                avgPrice:{
+                    $avg:"$price"
+                },
+                minPrice:{
+                    $min:"$price"
+                },
+                maxPrice:{
+                    $max:"$price"
+                },
+                avgRating:{
+                    $avg:"$ratingAverage"
+                },
+                numRating:{
+                    $sum:"$ratingQuantity"
+                }
+            }
+        },
+        {
+            $sort:{
+                avgPrice:1
+            }
+        },
+        {
+            $match:{
+                _id:{
+                    $ne:"easy"
+                }
+            }
+        }
+    ]);
+
+    res.json({
+        status:"success",
+        data:stats
+    })
+}
