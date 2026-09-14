@@ -45,7 +45,7 @@ class APIFeatures {
     const limit = Number(this.queryStr.limit) || 100;
     const skip = (page - 1) * limit;
     this.query = this.query.skip(skip).limit(limit);
-    // return this;
+    return this;
   }
 }
 
