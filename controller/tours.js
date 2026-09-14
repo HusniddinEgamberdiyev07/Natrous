@@ -4,8 +4,8 @@ const APIFeatures = require("../utils/apiFeatures");
 exports.getAllTours = async (req, res)=>{
     try{
         const features =  new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().pagination();
-        const tours = await features.query;
-        
+        const tours = await features.query;    
+
         res.status(200).json({
             status:"success",
             results:tours.length,
@@ -13,6 +13,7 @@ exports.getAllTours = async (req, res)=>{
                 tours
             }
         })
+
     }catch(err){
         res.status(500).json({
             status:"fail",
@@ -118,17 +119,64 @@ exports.tourStats = async (req, res)=>{
                 avgPrice:1
             }
         },
-        {
-            $match:{
-                _id:{
-                    $ne:"easy"
-                }
-            }
-        }
     ]);
 
     res.json({
         status:"success",
         data:stats
+    })
+}
+
+exports.getMonthlyPlan = async (req, res)=>{
+    const year = req.params.year;
+
+    const plan = await Tour.aggregate([
+        {
+            $unwind:"$startDates"
+        },
+        {
+            $match:{
+                startDates:{
+                    $gte:new Date(`${year}-01-01`),
+                    $lte:new Date(`${year}-12-31`)
+                }
+            }
+        },
+        {
+            $group:{
+                _id:{
+                    $month:"$startDates"
+                },
+                numTours:{
+                    $sum:1
+                },
+                tours:{
+                    $push:"$name"
+                }
+            }
+        },
+        {
+            $addFields:{
+                month:"$_id"
+            }
+        },
+        {
+            $project:{
+                _id:0
+            }
+        },
+        {
+            $sort:{
+                numTours:-1
+            }
+        },
+        // {
+        //     $limit:6
+        // }
+    ])
+
+    res.json({
+        status:"success",
+        data:plan
     })
 }

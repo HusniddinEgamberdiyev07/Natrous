@@ -1,5 +1,5 @@
 const express = require("express");
-const {getAllTours, getTour, createTour, deleteTour, updateTour, tourStats} = require("../controller/tours")
+const {getAllTours, getTour, createTour, deleteTour, updateTour, tourStats, getMonthlyPlan} = require("../controller/tours")
 
 const tourRouter = express.Router();
 
@@ -11,6 +11,10 @@ tourRouter
 tourRouter
     .route("/stats")
     .get(tourStats)
+
+tourRouter
+.route("/monthly-plans/:year")
+.get(getMonthlyPlan)
 
 tourRouter
     .route("/:id")
