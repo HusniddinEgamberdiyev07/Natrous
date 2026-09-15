@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const toursSchema = new mongoose.Schema({
     name:{
@@ -6,7 +7,8 @@ const toursSchema = new mongoose.Schema({
         required:[true, "Tour must have a name"],
         unique:[true, "Name must be unique"],
         maxlength:[40, "A tour's name must contain max 50 chars"],
-        minlength:[10, "A tour's name must contain min 10 chars"]
+        minlength:[10, "A tour's name must contain min 10 chars"],
+        validate:[validator.isAlpha, "A tour's name can contain only letters"]
     },
     price:{
         type:Number,
@@ -56,7 +58,18 @@ const toursSchema = new mongoose.Schema({
         type:Date,
         default:Date.now()
     },
-    startDates:[Date]
+    startDates:[Date],
+    priceDiscount:{
+        type:Number,
+        default:0,
+        validate:{
+            // this refres to current doc on doc creation. It does not work when updating.
+            validator:function(val){
+                return this.price > val
+            },
+            message:"Discount price must be lower or equal to price"
+        }
+    }
 },{
     toJSON:{virtuals:true},
     toObject:{virtuals:true}
