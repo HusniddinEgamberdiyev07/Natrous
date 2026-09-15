@@ -72,8 +72,20 @@ toursSchema.post("save", function(){
 
 // 2. Query middleware
 
+/*
 toursSchema.pre(/^find/, function(){
     console.log("You are querying 👀")
+    console.log(this);
 })
+*/
+
+// 3. Aggregation middleware
+
+/*
+toursSchema.pre("aggregate", function(){
+    console.log("Before agregation");
+    console.log(this.pipeline());
+})
+*/
 
 module.exports = mongoose.model("Tour", toursSchema);
