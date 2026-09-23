@@ -8,7 +8,7 @@ const toursSchema = new mongoose.Schema({
         unique:[true, "Name must be unique"],
         maxlength:[40, "A tour's name must contain max 50 chars"],
         minlength:[10, "A tour's name must contain min 10 chars"],
-        validate:[validator.isAlpha, "A tour's name can contain only letters"]
+        // validate:[validator.isAlpha, "A tour's name can contain only letters"]
     },
     price:{
         type:Number,
