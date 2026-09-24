@@ -18,7 +18,8 @@ const usersSchema = new mongoose.Schema({
     password:{
         type:String,
         required:[true, "Please tell us your password"],
-        minlength:[8, "Password must contain 8 or more chars"]
+        minlength:[8, "Password must contain 8 or more chars"],
+        select:false
     },
     passwordConfirm:{
         type:String,
@@ -40,5 +41,12 @@ usersSchema.pre("save", async function(){
     this.password = await bcrypt.hash(this.password,13);
     this.passwordConfirm = undefined; // we don't want to save it to the database;
 })
+
+// instance method. It will be accessible for every doc. this keyword points to the current doc
+
+usersSchema.methods.correctPassword = async function(candidatePassword, userPassword){
+    return await bcrypt.compare(candidatePassword, userPassword);
+}
+
 
 module.exports = mongoose.model("User", usersSchema);
