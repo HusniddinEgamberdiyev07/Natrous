@@ -1,5 +1,8 @@
 const AppError = require("../utils/appError")
 
+const handleInvalidToken = () => new AppError("Invalid token. Please, login again", 401);
+const handleExpiredToken = () => new AppError("Expired token. Please, login again", 401);
+
 const handleCastErrorDb = err => {
     const message = `Invalid ${err.path}: ${err.value}`
     return new AppError(message, 400)
@@ -57,6 +60,8 @@ module.exports = (err, req, res, next)=>{
 
         if(error.name === "CastError") error = handleCastErrorDb(error)
         if(error.name === "ValidationError") error = handleValidationDb(error)
+        if(error.name === "JsonWebTokenError") error = handleInvalidToken()
+        if(error.name === "TokenExpiredError") error = handleExpiredToken()
         if(error.cause?.code === 11000) error = handleDuplicateDb(error)
 
         sendErrorProd(error, res)
