@@ -5,13 +5,17 @@ const AppError = require("../utils/appError");
 
 const signToken = id => jwt.sign({id}, process.env.SECRET_JWT_KEY, {expiresIn:process.env.JWT_EXPIRES_IN});
 
-exports.signUp = async (req, res)=>{
+exports.signUp = async (req, res, next)=>{
+
+    if(req.body.role === "admin") return next(new AppError("You cannot assign admin role", 403));
+
     const newUser = await Users.create({
         name:req.body.name,
         email:req.body.email,
         password:req.body.password,
         passwordConfirm:req.body.passwordConfirm,
-        passwordChangedAt:req.body.passwordChangedAt
+        passwordChangedAt:req.body.passwordChangedAt,
+        role:req.body.role || "user"
     });
 
     const token = signToken(newUser._id);
@@ -69,4 +73,12 @@ exports.protect = async (req, res, next) =>{
     // Grant access to protected route
     req.user = currentUser;
     next();
+}
+
+
+exports.restrictedTo=(...roles)=>{
+    return (req, res, next)=>{
+        if(!roles.includes(req.user.role)) return next(new AppError(`You do not have a permission to do this action`, 403));
+        next()
+    }
 }
